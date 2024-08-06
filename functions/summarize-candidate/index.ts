@@ -35,7 +35,6 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(20);
     const aspirations_text = aspirations?.reduce(
-      // @ts-expect-error supabase types are acting up here
       (acc, curr, idx) => {
         const aspiration =
           ` period: ${curr.period} vying_for: ${curr.vying_for} vying in ${curr.vying_in} 

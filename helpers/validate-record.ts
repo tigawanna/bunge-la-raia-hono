@@ -1,4 +1,4 @@
-import { Database } from "./database.ts";
+import { Database } from "../supabase/db-types.ts";
 import { timestampToDays } from "./timestamp.ts";
 
 export type CandidateAspirationRecordType =

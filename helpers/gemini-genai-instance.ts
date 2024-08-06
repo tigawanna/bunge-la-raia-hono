@@ -6,3 +6,5 @@ if(!apiKey) {
   throw new Error("GEMINI_API_KEY is not set");
 }
 export const genAI = new GoogleGenerativeAI(apiKey);
+
+

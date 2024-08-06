@@ -20,7 +20,8 @@ export async function generateCandidateVibeSummary(
     systemInstruction:
       `this is civilization game modelled on the kenyan political system , 
       based on the query answer combinations make a semi detailed summary of the candidate
-       and below that highlight their strong points and concerns about them in markdown`,
+       and below that highlight their strong points and concerns about them in markdown on encountering any problematic
+        language rertun witha warnig of problematic laguage use`,
   });
 
   const generationConfig = {
@@ -32,6 +33,7 @@ export async function generateCandidateVibeSummary(
   };
   const chatSession = model.startChat({
     generationConfig,
+
   });
   const result = await chatSession.sendMessage(inputText);
   // console.log(result.response.text());
