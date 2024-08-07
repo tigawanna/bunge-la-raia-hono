@@ -5,11 +5,15 @@ import { Database } from "../../supabase/db-types.ts";
 import { geminiEmbedding } from "../../helpers/generate-embedding.ts";
 import { getCandidateContext, updateCandidate } from "./supabase.ts";
 import { generateCandidateVibeSummary } from "../../helpers/generate-summary.ts";
-import { getConnInfo } from "hono/deno";
+import { ipRateLimit, viewerRateLimit } from "./rate-limit.ts";
 interface SummarizeRequestBody {
   record: CandidateRecordType;
 }
 const app = new Hono();
+
+app.get("/", (c) => {
+  return c.json({ message: "candidate route" });
+});
 app.get("/summarize", (c) => {
   return c.json({ message: "summary route" });
 });
@@ -77,28 +81,29 @@ app.post("/summarize", async (c) => {
     return c.json({ message: "Something went wrong: " + error.message }, 500);
   }
 });
+
 interface ChatRequestBody {
   viewer_id: string;
-  candidate_id: string;
   context_text: string; // this should be info about the candidate's most recent spirations together with any chat history if vailabe
 }
+app.get("/chat", (c) => {
+  return c.json({ message: "chat route" });
+});
 app.post("/chat", async (c) => {
-  const connInfo = getConnInfo(c);
-  const ipAddress = connInfo?.remote?.address??""
-
-  const { candidate_id,context_text,viewer_id } = await c.req.json<ChatRequestBody>();
-  if (!candidate_id) {
-    return c.json({ message: "candidate id should be provided" }, 400);
-  }
+  const kv = await Deno.openKv();
+  await ipRateLimit({ c, kv });
+  const { context_text, viewer_id } = await c.req.json<ChatRequestBody>();
   if (!viewer_id) {
     return c.json({ message: "viewer id should be provided" }, 400);
   }
   if (!context_text) {
     return c.json({ message: "context text should be provided" }, 400);
   }
-  const kv = await Deno.openKv();
-  const current_viewer = await kv.get([viewer_id,"visit-count"]);
-
+ const supabaseClient = createClient<Database>(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_KEY") ?? ""
+  );
+  await viewerRateLimit({ c, kv, sb: supabaseClient, viewer_id });
   return c.json({ message: "chat route" });
 });
 
