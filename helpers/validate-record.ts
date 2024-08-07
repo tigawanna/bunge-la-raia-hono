@@ -2,8 +2,7 @@ import { Database } from "../supabase/db-types.ts";
 import { timestampToDays } from "./timestamp.ts";
 
 export type CandidateAspirationRecordType =
-  & Database["public"]["Tables"]["candidate_aspirations"]["Row"]
-  & {
+  Database["public"]["Tables"]["candidate_aspirations"]["Row"] & {
     vibe_check: Array<{ query: string; answer: string }>;
   };
 
@@ -16,10 +15,8 @@ export function validateAspiration(record: CandidateAspirationRecordType) {
   const can_prrompt_right_now = last_proompted > 4;
   if (record.last_proompted_on && !can_prrompt_right_now) {
     return new Response(
-      `weekly prompt limit reached. please try again in ${
-        5 - last_proompted
-      } days`,
-      { status: 422 },
+      `weekly prompt limit reached. please try again in ${5 - last_proompted} days`,
+      { status: 422 }
     );
   }
   if (record?.mission_statement.length < 10) {
@@ -40,14 +37,9 @@ export function validateAspiration(record: CandidateAspirationRecordType) {
   return raw_string_input;
 }
 
-
-
-
-export type CandidateRecordType =
-  & Database["public"]["Tables"]["candidates"]["Row"]
-  & {
-    vibe_check: Array<{ query: string; answer: string }>;
-  };
+export type CandidateRecordType = Database["public"]["Tables"]["candidates"]["Row"] & {
+  vibe_check: Array<{ query: string; answer: string }>;
+};
 export function validateCandidate(record: CandidateRecordType) {
   if (!record) {
     return new Response("No record found", { status: 400 });
@@ -56,10 +48,8 @@ export function validateCandidate(record: CandidateRecordType) {
   const can_prrompt_right_now = last_proompted > 4;
   if (record.last_proompted_on && !can_prrompt_right_now) {
     return new Response(
-      `weekly prompt limit reached. please try again in ${
-        5 - last_proompted
-      } days`,
-      { status: 422 },
+      `weekly prompt limit reached. please try again in ${5 - last_proompted} days`,
+      { status: 422 }
     );
   }
   if (!record?.bio || record?.bio.length < 10) {
@@ -73,24 +63,15 @@ export function validateCandidate(record: CandidateRecordType) {
     return new Response("Not enough vibe check data ", { status: 400 });
   }
 
-  const raw_string_input =
-    `My name is ${record.name} and my bio is : ${record.bio}
+  const raw_string_input = `My name is ${record.name} and my bio is : ${record.bio}
     my vibe check quiz questions and answers are ${vibe_check}`;
   return raw_string_input;
 }
 
+export type PublicUserRecordType = Database["public"]["Tables"]["users"]["Row"] & {
+  vibe_check: Array<{ query: string; answer: string }>;
+};
 
-
-
-
-
-export type PublicUserRecordType =
-  & Database["public"]["Tables"]["users"]["Row"]
-  & {
-    vibe_check: Array<{ query: string; answer: string }>;
-  };
-
-  
 export function validateUser(record: PublicUserRecordType) {
   if (!record) {
     return new Response("No record found", { status: 400 });
@@ -99,10 +80,8 @@ export function validateUser(record: PublicUserRecordType) {
   const can_prrompt_right_now = last_proompted > 4;
   if (record?.last_proompted_on && !can_prrompt_right_now) {
     return new Response(
-      `weekly prompt limit reached. please try again in ${
-        5 - last_proompted
-      } days`,
-      { status: 422 },
+      `weekly prompt limit reached. please try again in ${5 - last_proompted} days`,
+      { status: 422 }
     );
   }
   if (!record?.bio || record?.bio.length < 10) {
@@ -116,8 +95,7 @@ export function validateUser(record: PublicUserRecordType) {
     return new Response("Not enough vibe check data ", { status: 400 });
   }
 
-  const raw_string_input =
-    `My name is ${record.username} and my mission statement is : ${record.bio}
+  const raw_string_input = `My name is ${record.username} and my mission statement is : ${record.bio}
     my vibe check quiz questions and answers are ${vibe_check}`;
   return raw_string_input;
 }

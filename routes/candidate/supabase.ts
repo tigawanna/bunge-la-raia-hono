@@ -4,7 +4,7 @@ import { CandidateRecordType } from "../../helpers/validate-record.ts";
 
 interface GetCandidateContext {
   sb: SupabaseClient<Database>;
-  record: Partial<CandidateRecordType>&{id: string};
+  record: Partial<CandidateRecordType>&{id: string };
 }
 export async function getCandidateContext({sb,record}: GetCandidateContext) {
     try {

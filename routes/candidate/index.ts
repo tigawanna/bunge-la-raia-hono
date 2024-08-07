@@ -6,6 +6,7 @@ import { geminiEmbedding } from "../../helpers/generate-embedding.ts";
 import { getCandidateContext, updateCandidate } from "./supabase.ts";
 import { generateCandidateVibeSummary } from "../../helpers/generate-summary.ts";
 import { ipRateLimit, viewerRateLimit } from "./rate-limit.ts";
+import { chatWith } from "../../helpers/chat-with.ts";
 interface SummarizeRequestBody {
   record: CandidateRecordType;
 }
@@ -50,12 +51,15 @@ app.post("/summarize", async (c) => {
       return c.json({ message: "candidate summary generation failed" }, 400);
     }
     const embeddingResult = await geminiEmbedding({
-      inputText: summary_text,
+      inputText: candidateContext,
     });
     // update candidate summary
     const { error: updateCandidateSummaryError } = await updateCandidate({
       sb: supabaseClient,
-      record: { id: record.id, candidate_summary: summary_text },
+      record: {
+        id: record.id,
+        candidate_summary: summary_text,
+      },
     });
 
     if (updateCandidateSummaryError) {
@@ -84,6 +88,7 @@ app.post("/summarize", async (c) => {
 
 interface ChatRequestBody {
   viewer_id: string;
+  prompt: string;
   context_text: string; // this should be info about the candidate's most recent spirations together with any chat history if vailabe
 }
 app.get("/chat", (c) => {
@@ -92,18 +97,19 @@ app.get("/chat", (c) => {
 app.post("/chat", async (c) => {
   const kv = await Deno.openKv();
   await ipRateLimit({ c, kv });
-  const { context_text, viewer_id } = await c.req.json<ChatRequestBody>();
+  const { context_text, viewer_id, prompt } = await c.req.json<ChatRequestBody>();
   if (!viewer_id) {
     return c.json({ message: "viewer id should be provided" }, 400);
   }
   if (!context_text) {
     return c.json({ message: "context text should be provided" }, 400);
   }
- const supabaseClient = createClient<Database>(
+  const supabaseClient = createClient<Database>(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_KEY") ?? ""
   );
   await viewerRateLimit({ c, kv, sb: supabaseClient, viewer_id });
+  await chatWith({ context_text, prompt });
   return c.json({ message: "chat route" });
 });
 
