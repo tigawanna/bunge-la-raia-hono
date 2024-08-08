@@ -1,17 +1,18 @@
 import { Hono } from "hono";
-import { CandidateRecordType, validateCandidate } from "../../helpers/validate-record.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2.44.4";
 import { Database } from "../../supabase/db-types.ts";
 import { geminiEmbedding } from "../../helpers/generate-embedding.ts";
-import { getCandidateAspirationContextFromRecord, updateCandidateAspration } from "./supabase_stuff.ts";
+import { getUserContextFromRecord, updateUser } from "./supabase_stuff.ts";
+import { PublicUserRecordType, validateUser } from "./validate-record.ts";
+
 
 interface SummarizeRequestBody {
-  record: CandidateRecordType;
+  record: PublicUserRecordType
 }
 const app = new Hono();
 
 app.get("/", (c) => {
-  return c.json({ message: "candidate aspiration route" });
+  return c.json({ message: "user aspiration route" });
 });
 app.post("/embed", async (c) => {
   try {
@@ -29,31 +30,30 @@ app.post("/embed", async (c) => {
     if (!record?.id) {
       return c.json({ message: "payload record id should be provided" }, 400);
     }
-    const raw_string_input = validateCandidate(record);
+    const raw_string_input = validateUser(record);
     if (raw_string_input instanceof Response) {
       return raw_string_input;
     }
-    //  get candidate's most recent spirations
-    const candidateContext = await getCandidateAspirationContextFromRecord({
-      sb: supabaseClient,
+    //  get user's most recent spirations
+    const userContext = await getUserContextFromRecord({
       record,
     });
     const embeddingResult = await geminiEmbedding({
-      inputText: candidateContext,
+      inputText: userContext,
     });
-    // update candidate embedding
-    const { error: updateCandidateEmbeddingError } = await updateCandidateAspration({
+    // update user embedding
+    const { error: updateuserEmbeddingError } = await updateUser({
       sb: supabaseClient,
       //@ts-expect-error: this might be wrong
       record: { id: record.id, embedding: embeddingResult.embedding.values },
     });
-    if (updateCandidateEmbeddingError) {
+    if (updateuserEmbeddingError) {
       return c.json(
-        { message: "candidate aspiration embedding update failed" + updateCandidateEmbeddingError.message },
+        { message: "user  embedding update failed" + updateuserEmbeddingError.message },
         400
       );
     }
-    return c.json({ message: "candidate aspiration summary + embedding updated successfully" }, 200);
+    return c.json({ message: "user  summary + embedding updated successfully" }, 200);
   } catch (error) {
     return c.json({ message: "Something went wrong: " + error.message }, 500);
   }
@@ -61,4 +61,4 @@ app.post("/embed", async (c) => {
 
 
 
-export { app as candidateAspirationRoute };
+export { app as userRoute };
