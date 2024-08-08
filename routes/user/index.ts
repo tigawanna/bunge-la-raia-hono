@@ -12,7 +12,7 @@ interface SummarizeRequestBody {
 const app = new Hono();
 
 app.get("/", (c) => {
-  return c.json({ message: "user aspiration route" });
+  return c.json({ message: "user route" });
 });
 app.post("/embed", async (c) => {
   try {

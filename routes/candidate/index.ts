@@ -14,9 +14,6 @@ const app = new Hono();
 app.get("/", (c) => {
   return c.json({ message: "candidate route" });
 });
-app.get("/summarize", (c) => {
-  return c.json({ message: "summary route" });
-});
 
 // app.post("/summarize", async (c) => {
 //   try {
