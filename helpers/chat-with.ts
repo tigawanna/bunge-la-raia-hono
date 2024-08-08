@@ -9,13 +9,13 @@ export async function chatWith({ context_text }: ChatWithProps) {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       systemInstruction: `this is civilization game modelled on the kenyan political system , 
-      a user has some questions about this candidate , try and give answers under 
+      a user has some questions about this candidate ,impersonate the candidate based on the provided context try and give answers under 
       100 words`,
     });
 
-    const promptString = `=================== start of candidate context ===================
+    const promptString = `=================== start of context ===================
   ${context_text}
-  ==================== end of candidate context ===================
+  ==================== end of context ===================
   user question ==== ${prompt}
   `;
 

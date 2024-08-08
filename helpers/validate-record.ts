@@ -38,6 +38,7 @@ export function validateAspiration(record: CandidateAspirationRecordType) {
 }
 
 export type CandidateRecordType = Database["public"]["Tables"]["candidates"]["Row"] & {
+  embedding?: number[];
   vibe_check: Array<{ query: string; answer: string }>;
 };
 export function validateCandidate(record: CandidateRecordType) {

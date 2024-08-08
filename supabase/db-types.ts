@@ -1,4 +1,4 @@
- export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -9,18 +9,6 @@
 export type Database = {
   public: {
     Tables: {
-      bind_permissions: {
-        Row: {
-          count: number | null
-        }
-        Insert: {
-          count?: number | null
-        }
-        Update: {
-          count?: number | null
-        }
-        Relationships: []
-      }
       candidate_aspirations: {
         Row: {
           aspiration_summary: string | null
@@ -73,6 +61,48 @@ export type Database = {
             columns: ["candidate_id"]
             isOneToOne: false
             referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidate_reviews: {
+        Row: {
+          candidate_id: string | null
+          comment: string | null
+          created_at: string
+          id: number
+          rating: number | null
+          reviewr_id: string | null
+        }
+        Insert: {
+          candidate_id?: string | null
+          comment?: string | null
+          created_at?: string
+          id?: number
+          rating?: number | null
+          reviewr_id?: string | null
+        }
+        Update: {
+          candidate_id?: string | null
+          comment?: string | null
+          created_at?: string
+          id?: number
+          rating?: number | null
+          reviewr_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_reviews_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidate_reviews_review_by_fkey"
+            columns: ["reviewr_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

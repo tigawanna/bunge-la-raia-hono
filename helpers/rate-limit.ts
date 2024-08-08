@@ -2,7 +2,7 @@ import { getConnInfo } from "https://jsr.io/@hono/hono/4.5.3/src/adapter/deno/co
 import { Context } from "https://jsr.io/@hono/hono/4.5.3/src/context.ts";
 import SupabaseClient from "https://jsr.io/@supabase/supabase-js/2.44.4/src/SupabaseClient.ts";
 import { BlankEnv, BlankInput } from "jsr:@hono/hono@^4.5.3/types";
-import { Database } from "../../supabase/db-types.ts";
+import { Database } from "../supabase/db-types.ts";
 
 interface RateLimitprops {
   c: Context<BlankEnv, "/chat", BlankInput>;
