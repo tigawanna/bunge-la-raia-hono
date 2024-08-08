@@ -5,7 +5,6 @@
   "tasks": {
     "start": "deno run --allow-net --allow-env --allow-read --unstable-kv --watch  main.ts",
     "supa-types": "npx supabase gen types --lang=typescript --project-id 'rkbhyhctbdyypucjercs' --schema public > supabase/db-types.ts"
-
   },
   "compilerOptions": {
     "jsx": "precompile",
